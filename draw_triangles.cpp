@@ -133,10 +133,10 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
       currentLayer[w] = false;
       for (int i = 0; i < space.objects.size(); i++) {
         for (int j = 1; j < space.objects[i].triangles.size(); j++) {
-          float x0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].x;
-          float x1 = space.objects[i].points[space.objects[i].draw_order[j]].x;
-          float z0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].z;
-          float z1 = space.objects[i].points[space.objects[i].draw_order[j]].z;
+          float x0 = space.objects[i].points[space.objects[i].triangles[j - 1]].x;
+          float x1 = space.objects[i].points[space.objects[i].triangles[j]].x;
+          float z0 = space.objects[i].points[space.objects[i].triangles[j - 1]].z;
+          float z1 = space.objects[i].points[space.objects[i].triangles[j]].z;
           for (float k = 0; k <= 1; k += 0.1) {
             int xcheck = round(x0 * (1.0 - k) + (x1 * k));
             int zcheck = round(z0 * (1.0 - k) + (z1 * k));
