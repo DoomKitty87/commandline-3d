@@ -127,7 +127,6 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
     renderedPixels.push_back(currentLayer);
   }
   //Render points
-
   vector<vector<bool> > renderedLines = vector<vector<bool> >();
 
   for (int h = 0; h < camera.resolution.second; h++) {
@@ -161,6 +160,8 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
 }
 
 int main() {
+  int fps = 20;
+
   Space space = Space();
   //WorldSpaceObject object1 = WorldSpaceObject();
   //object1.position = Vector3(0, 0, 0);
@@ -193,6 +194,6 @@ int main() {
       }
       cout << endl;
     }
-    Sleep(50);
+    Sleep(1000 / fps);
   }
 }
