@@ -12,6 +12,16 @@ class Vector3
     float x;
     float y;
     float z;
+    Vector3() {
+      x = 0;
+      y = 0;
+      z = 0;
+    }
+    Vector3(float xin, float yin, float zin) {
+      x = xin;
+      y = yin;
+      z = zin;
+    }
 };
 
 //Holds array of its visible points relative to its position, and its position.
@@ -36,20 +46,55 @@ class Camera
     pair<int, int> resolution;
 };
 
-WorldSpaceObject rotateObject(WorldSpaceObject object, float radians) {
+WorldSpaceObject rotateObject(WorldSpaceObject object, float radians, char axis) {
   WorldSpaceObject objectout = object;
   for (int i = 0; i < objectout.points.size(); i++) {
     Vector3 point = objectout.points[i];
-    point.x -= objectout.position.x;
-    point.y -= objectout.position.y;
-    int newx = round((point.x * cos(radians) - point.y * sin(radians)) + objectout.position.x);
-    int newy = round((point.x * sin(radians) + point.y * cos(radians)) + objectout.position.y);
-    point.x = newx;
-    point.y = newy;
-    objectout.points[i] = point;
+    if (axis == 'z') {
+      point.x -= objectout.position.x;
+      point.y -= objectout.position.y;
+      float newx = (point.x * cos(radians) - point.y * sin(radians) + objectout.position.x);
+      float newy = (point.x * sin(radians) + point.y * cos(radians) + objectout.position.y);
+      point.x = newx;
+      point.y = newy;
+      objectout.points[i] = point;
+    }
+    else if (axis == 'x') {
+      point.y -= objectout.position.y;
+      point.z -= objectout.position.z;
+      float newy = (point.y * cos(radians) - point.z * sin(radians) + objectout.position.y);
+      float newz = (point.y * sin(radians) + point.z * cos(radians) + objectout.position.z);
+      point.y = newy;
+      point.z = newz;
+      objectout.points[i] = point;
+    }
+    else if (axis == 'y') {
+      point.x -= objectout.position.x;
+      point.z -= objectout.position.z;
+      float newx = (point.x * cos(radians) - point.z * sin(radians) + objectout.position.x);
+      float newz = (point.x * sin(radians) + point.z * cos(radians) + objectout.position.z);
+      point.x = newx;
+      point.z = newz;
+      objectout.points[i] = point;
+    }
+    
   }
-  
   return objectout;
+}
+
+WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
+  WorldSpaceObject obj = WorldSpaceObject();
+  obj.points.push_back(Vector3(-vertexdistance, -vertexdistance, -vertexdistance));
+  obj.points.push_back(Vector3(vertexdistance, -vertexdistance, -vertexdistance));
+  obj.points.push_back(Vector3(-vertexdistance, vertexdistance, -vertexdistance));
+  obj.points.push_back(Vector3(vertexdistance, vertexdistance, -vertexdistance));
+  obj.points.push_back(Vector3(-vertexdistance, -vertexdistance, vertexdistance));
+  obj.points.push_back(Vector3(vertexdistance, -vertexdistance, vertexdistance));
+  obj.points.push_back(Vector3(-vertexdistance, vertexdistance, vertexdistance));
+  obj.points.push_back(Vector3(vertexdistance, vertexdistance, vertexdistance));
+
+  obj.position = position;
+  return obj;
 }
 
 //Y axis is forward for cameras- and view is projected along it.
@@ -61,7 +106,7 @@ vector<vector<bool> > render_camera(Camera camera, Space space) {
     for (int w = 0; w < camera.resolution.first; w++) {
       for (int i = 0; i < space.objects.size(); i++) {
         for (int j = 0; j < space.objects[i].points.size(); j++) {
-          if (space.objects[i].points[j].x == camera.position.x + (w - camera.resolution.first / 2) && space.objects[i].points[j].z == camera.position.z + (h - camera.resolution.second / 2)) {
+          if (round(space.objects[i].points[j].x) == camera.position.x + (w - camera.resolution.first / 2) && round(space.objects[i].points[j].z) == camera.position.z + (h - camera.resolution.second / 2)) {
             currentLayer[w] = true;
           }
           else if (!currentLayer[w]) currentLayer[w] = false;
@@ -76,59 +121,23 @@ vector<vector<bool> > render_camera(Camera camera, Space space) {
 
 int main() {
   Space space = Space();
-  WorldSpaceObject object1 = WorldSpaceObject();
-  object1.position = Vector3();
-  object1.position.x = 0;
-  object1.position.y = 0;
-  object1.position.z = 0;
-  Vector3 point1 = Vector3();
-  point1.x = 0;
-  point1.y = 0;
-  point1.x = 0;
-  object1.points.push_back(point1);
+  //WorldSpaceObject object1 = WorldSpaceObject();
+  //object1.position = Vector3(0, 0, 0);
+  //Vector3 point1 = Vector3(0, 0, 0);
+  //object1.points.push_back(point1);
   //space.objects.push_back(object1);
-  WorldSpaceObject cube = WorldSpaceObject();
-  cube.position = Vector3();
-  cube.position.x = 0;
-  cube.position.y = 0;
-  cube.position.z = 0;
-  for (int i = 0; i < 8; i++) cube.points.push_back(Vector3());
-  cube.points[0].x = -2;
-  cube.points[0].y = -2;
-  cube.points[0].z = -1;
-  cube.points[1].x = 2;
-  cube.points[1].y = -2;
-  cube.points[1].z = -1;
-  cube.points[2].x = -2;
-  cube.points[2].y = 2;
-  cube.points[2].z = -2;
-  cube.points[3].x = 2;
-  cube.points[3].y = 2;
-  cube.points[3].z = -2;
-  cube.points[4].x = -2;
-  cube.points[4].y = -2;
-  cube.points[4].z = 3;
-  cube.points[5].x = 2;
-  cube.points[5].y = -2;
-  cube.points[5].z = 3;
-  cube.points[6].x = -2;
-  cube.points[6].y = 2;
-  cube.points[6].z = 2;
-  cube.points[7].x = 2;
-  cube.points[7].y = 2;
-  cube.points[7].z = 2;
+  WorldSpaceObject cube = generateCube(Vector3(0, 0, 0), 5);
   space.objects.push_back(cube);
   Camera cam = Camera();
-  cam.position.x = 0;
-  cam.position.y = 0;
-  cam.position.z = 0;
+  cam.position = Vector3(0, 0, 0);
   cam.resolution.first = 50;
-  cam.resolution.second = 10;
+  cam.resolution.second = 20;
   while(true) {
     for (int i = 0; i < 50; i++) {
       cout << endl;
     }
-    space.objects[0] = rotateObject(space.objects[0], 0.5);
+    space.objects[0] = rotateObject(space.objects[0], 0.05, 'x');
+    space.objects[0] = rotateObject(space.objects[0], 0.1, 'z');
     //Vector3 newpoint = Vector3();
     //newpoint.x = (rand() % (cam.resolution.first) - (cam.resolution.first / 2));
     //newpoint.y = (rand() % (cam.resolution.first) - (cam.resolution.first / 2));
