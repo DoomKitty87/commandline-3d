@@ -30,7 +30,7 @@ class WorldSpaceObject
   public:
     Vector3 position;
     vector<Vector3> points;
-    vector<int> draw_order;
+    vector<int> triangles;
 };
 
 class Space
@@ -94,14 +94,11 @@ WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
   obj.points.push_back(Vector3(-vertexdistance, vertexdistance, vertexdistance));
   obj.points.push_back(Vector3(vertexdistance, vertexdistance, vertexdistance));
 
-  obj.draw_order.push_back(0);
-  obj.draw_order.push_back(1);
-  obj.draw_order.push_back(2);
-  obj.draw_order.push_back(3);
-  obj.draw_order.push_back(4);
-  obj.draw_order.push_back(5);
-  obj.draw_order.push_back(6);
-  obj.draw_order.push_back(7);
+  for (int i = 1; i < 7; i++) {
+    obj.triangles.push_back(i);
+    obj.triangles.push_back(i - 1);
+    obj.triangles.push_back(i + 1);
+  }
 
   obj.position = position;
   return obj;
@@ -135,7 +132,7 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
     for (int w = 0; w < camera.resolution.first; w++) {
       currentLayer[w] = false;
       for (int i = 0; i < space.objects.size(); i++) {
-        for (int j = 0; j < space.objects[i].draw_order.size(); j++) {
+        for (int j = 1; j < space.objects[i].triangles.size(); j++) {
           float x0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].x;
           float x1 = space.objects[i].points[space.objects[i].draw_order[j]].x;
           float z0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].z;
