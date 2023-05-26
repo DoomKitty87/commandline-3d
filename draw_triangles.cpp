@@ -2,7 +2,12 @@
 #include <vector>
 #include <cmath>
 #include <math.h>
+#ifdef _WINDOWS
 #include <windows.h>
+#else
+#include<unistd.h>
+#define Sleep(x) usleep((x) * 1000)
+#endif
 using namespace std;
 
 class Vector3
