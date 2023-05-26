@@ -135,7 +135,7 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
     for (int w = 0; w < camera.resolution.first; w++) {
       currentLayer[w] = false;
       for (int i = 0; i < space.objects.size(); i++) {
-        for (int j = 0; j < space.objects[i].draw_order.size(); j++) {
+        for (int j = 1; j < space.objects[i].draw_order.size(); j++) {
           float x0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].x;
           float x1 = space.objects[i].points[space.objects[i].draw_order[j]].x;
           float z0 = space.objects[i].points[space.objects[i].draw_order[j - 1]].z;
