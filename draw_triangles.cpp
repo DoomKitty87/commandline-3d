@@ -87,6 +87,57 @@ WorldSpaceObject rotateObject(WorldSpaceObject object, float radians, char axis)
   return objectout;
 }
 
+vector<int> windTrianglesOrdered(vector<Vector3> vertices) {
+  vector<int> triangles = vector<int>();
+  triangles.resize(vertices.size() * 3);
+  for (int i = 0; i < vertices.size(); i++) {
+    triangles[i * 3] = i;
+    triangles[i * 3 + 1] = i + 1;
+    triangles[i * 3 + 2] = i + 2;
+  }
+
+  return triangles;
+}
+
+vector<int> windTrianglesClosest(vector<Vector3> vertices) {
+  vector<int> triangles = vector<int>();
+  triangles.resize(vertices.size() * 3);
+
+  for (int i = 0; i < vertices.size(); i++) {
+    triangles[i * 3] = i;
+    float smallestDist = INFINITY;
+    int closestPoint = 0;
+    for (int j = 0; j < vertices.size(); j++) {
+      if (j == i) continue;
+      float xdist = abs(vertices[i].x - vertices[j].x);
+      float ydist = abs(vertices[i].y - vertices[j].y);
+      float zdist = abs(vertices[i].z - vertices[j].z);
+      if (xdist + ydist + zdist < smallestDist) {
+        smallestDist = xdist + ydist + zdist;
+        closestPoint = j;
+      }
+    }
+    smallestDist = INFINITY;
+    float closestPoint2 = 0;
+    for (int j = 0; j < vertices.size(); j++) {
+      if (j == i) continue;
+      if (j == closestPoint) continue;
+      float xdist = abs(vertices[i].x - vertices[j].x);
+      float ydist = abs(vertices[i].y - vertices[j].y);
+      float zdist = abs(vertices[i].z - vertices[j].z);
+      if (xdist + ydist + zdist < smallestDist) {
+        smallestDist = xdist + ydist + zdist;
+        closestPoint2 = j;
+      }
+    }
+
+    triangles[i * 3 + 1] = closestPoint;
+    triangles[i * 3 + 2] = closestPoint2;
+  }
+
+  return triangles;
+}
+
 WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
   WorldSpaceObject obj = WorldSpaceObject();
   obj.points.push_back(Vector3(-vertexdistance, -vertexdistance, -vertexdistance));
@@ -98,11 +149,7 @@ WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
   obj.points.push_back(Vector3(-vertexdistance, vertexdistance, vertexdistance));
   obj.points.push_back(Vector3(vertexdistance, vertexdistance, vertexdistance));
 
-  for (int i = 1; i < 7; i++) {
-    obj.triangles.push_back(i);
-    obj.triangles.push_back(i - 1);
-    obj.triangles.push_back(i + 1);
-  }
+  obj.triangles = windTrianglesOrdered(obj.points);
 
   obj.position = position;
   return obj;
