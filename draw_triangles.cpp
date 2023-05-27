@@ -138,6 +138,72 @@ vector<int> windTrianglesClosest(vector<Vector3> vertices) {
   return triangles;
 }
 
+vector<int> windTrianglesClosestRedundant(vector<Vector3> vertices) {
+  vector<int> triangles = vector<int>();
+  for (int i = 0; i < vertices.size(); i++) {
+    float smallestDist = INFINITY;
+    vector<int> closestPoints = vector<int>();
+    for (int j = 0; j < vertices.size(); j++) {
+      if (j == i) continue;
+      float xdist = abs(vertices[i].x - vertices[j].x);
+      float ydist = abs(vertices[i].y - vertices[j].y);
+      float zdist = abs(vertices[i].z - vertices[j].z);
+      if (xdist + ydist + zdist < smallestDist) {
+        smallestDist = xdist + ydist + zdist;
+        closestPoints = vector<int>();
+        closestPoints.push_back(j);
+      }
+      else if (xdist + ydist + zdist == smallestDist) {
+        closestPoints.push_back(j);
+      }
+    }
+    for (int j = 0; j < closestPoints.size(); j++) {
+      float smallestDistN = INFINITY;
+      vector<int> closestPointsN = vector<int>();
+      for (int k = 0; k < vertices.size(); k++) {
+        if (k == i || k == closestPoints[j]) continue;
+        float xdist = abs(vertices[i].x - vertices[k].x) + abs(vertices[closestPoints[j]].x - vertices[k].x);
+        float ydist = abs(vertices[i].y - vertices[k].y) + abs(vertices[closestPoints[j]].y - vertices[k].y);
+        float zdist = abs(vertices[i].z - vertices[k].z) + abs(vertices[closestPoints[j]].z - vertices[k].z);
+        if (xdist + ydist + zdist < smallestDistN) {
+          smallestDistN = xdist + ydist + zdist;
+          closestPointsN = vector<int>();
+          closestPointsN.push_back(k);
+        }
+        else if (xdist + ydist + zdist == smallestDistN) {
+          closestPointsN.push_back(k);
+        }
+      }
+      for (int k = 0; k < closestPointsN.size(); k++) {
+        triangles.push_back(i);
+        triangles.push_back(closestPoints[j]);
+        triangles.push_back(closestPointsN[k]);
+      }
+    }
+  }
+  vector<int> trianglesCleaned = vector<int>();
+  for (int i = 0; i < triangles.size() / 3; i++) {
+    bool unique = true;
+    for (int j = 0; j < trianglesCleaned.size() / 3; j++) {
+      vector<int> pool = vector<int>(3);
+      for (int k = 0; k < 3; k++) pool.push_back(trianglesCleaned[j * 3 + k]);
+      for (int k = 0; k < 3; k++) {
+        for (int l = 0; l < 3; l++) {
+          if (triangles[i * 3 + k] == trianglesCleaned[j * 3 + l]) pool.erase(pool.begin() + l);
+        }
+      }
+      if (pool.size() == 0) {
+        unique = false;
+        break;
+      }
+    }
+    if (unique) {
+      for (int j = 0; j < 3; j++) trianglesCleaned.push_back(triangles[i * 3 + j]);
+    }
+  }
+  return trianglesCleaned;
+}
+
 WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
   WorldSpaceObject obj = WorldSpaceObject();
   obj.points.push_back(Vector3(-vertexdistance, -vertexdistance, -vertexdistance));
@@ -149,7 +215,7 @@ WorldSpaceObject generateCube(Vector3 position, float vertexdistance) {
   obj.points.push_back(Vector3(-vertexdistance, vertexdistance, vertexdistance));
   obj.points.push_back(Vector3(vertexdistance, vertexdistance, vertexdistance));
 
-  obj.triangles = windTrianglesOrdered(obj.points);
+  obj.triangles = windTrianglesClosestRedundant(obj.points);
 
   obj.position = position;
   return obj;
