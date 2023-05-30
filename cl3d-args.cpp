@@ -250,10 +250,10 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
       currentLayer[w] = false;
       for (int i = 0; i < space.objects.size(); i++) {
         for (int j = 0; j < space.objects[i].triangles.size() / 3; j++) {
-          float x0 = space.objects[i].points[space.objects[i].triangles[j * 3]].x;
-          float x1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].x;
-          float z0 = space.objects[i].points[space.objects[i].triangles[j * 3]].z;
-          float z1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].z;
+          float x0 = space.objects[i].points[space.objects[i].triangles[j * 3]].x + space.objects[i].position.x;
+          float x1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].x + space.objects[i].position.x;
+          float z0 = space.objects[i].points[space.objects[i].triangles[j * 3]].z + space.objects[i].position.z;
+          float z1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].z + space.objects[i].position.z;
           for (float k = 0; k <= 1; k += 0.1) {
             int xcheck = round(x0 * (1.0 - k) + (x1 * k));
             int zcheck = round(z0 * (1.0 - k) + (z1 * k));
@@ -261,10 +261,10 @@ pair<vector<vector<bool> >, vector<vector<bool> > > render_camera(Camera camera,
               currentLayer[w] = true;
             }
           }
-          x0 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].x;
-          x1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 2]].x;
-          z0 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].z;
-          z1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 2]].z;
+          x0 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].x + space.objects[i].position.x;
+          x1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 2]].x + space.objects[i].position.x;
+          z0 = space.objects[i].points[space.objects[i].triangles[j * 3 + 1]].z + space.objects[i].position.z;
+          z1 = space.objects[i].points[space.objects[i].triangles[j * 3 + 2]].z + space.objects[i].position.z;
           for (float k = 0; k <= 1; k += 0.1) {
             int xcheck = round(x0 * (1.0 - k) + (x1 * k));
             int zcheck = round(z0 * (1.0 - k) + (z1 * k));
